@@ -26,6 +26,10 @@ import lombok.RequiredArgsConstructor;
 public class ProfileService {
     
     private final EmailService emailService;
+
+
+    //private final AppUserDetailsService appUserDetailsService;
+
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
