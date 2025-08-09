@@ -1,17 +1,17 @@
 package in.faizali.moneymanager.service;
 
+import java.util.Map;
 import java.util.UUID;
 
-//import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties.Authentication;
-
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 
 import in.faizali.moneymanager.dto.AuthDTO;
 import in.faizali.moneymanager.dto.ProfileDTO;
@@ -19,7 +19,6 @@ import in.faizali.moneymanager.entity.ProfileEntity;
 import in.faizali.moneymanager.repository.ProfileRepository;
 import in.faizali.moneymanager.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import java.util.Map;
 
 
 @Service
@@ -93,7 +92,7 @@ public class ProfileService {
     }
 
     public ProfileDTO getPublicProfile(String email){
-        ProfileEntity currentUser=null;
+        ProfileEntity currentUser;
         if(email==null){
             currentUser=getCurrentProfile();
         }else{
@@ -120,8 +119,8 @@ public class ProfileService {
                 "Token",token,
                 "user",getPublicProfile(authDTO.getEmail())
             );
-        } catch (Exception e) {
-            throw new RuntimeException("Invalid email or password");
+        } catch (BadCredentialsException | UsernameNotFoundException e) {
+            throw new RuntimeException("Invalid email or password",e);
         }
     }
 }

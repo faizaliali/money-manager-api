@@ -3,7 +3,6 @@ package in.faizali.moneymanager.controller;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
-//import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,7 +30,7 @@ public class ProfileController {
       public ResponseEntity<String> activateProfile(@RequestParam String token){
         boolean isActivated=profileService.activateProfile(token);
         if(isActivated){
-            return ResponseEntity.ok("Profile activa  ted successfully");
+            return ResponseEntity.ok("Profile activated successfully");
         }
         else{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Activation token not found or already used");

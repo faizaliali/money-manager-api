@@ -16,6 +16,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import in.faizali.moneymanager.security.JwtRequestFilter;
+//import in.faizali.moneymanager.service.AppUserDetailsService;
+
 //import in.faizali.moneymanager.service.AppUserDetailsService;
 
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -29,6 +32,8 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
      
     //private final AppUserDetailsService appUserDetailsService;
+    private final JwtRequestFilter jwtRequestFilter;
+
 
 
      @Bean
@@ -37,7 +42,8 @@ public class SecurityConfig {
        .csrf(AbstractHttpConfigurer::disable)
        .authorizeHttpRequests(auth ->auth.requestMatchers("/status","/health","/register","/activate","/login").permitAll()
        .anyRequest().authenticated())
-       .sessionManagement(session ->  session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+       .sessionManagement(session ->  session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+       .addFilterBefore(jwtRequestFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
        return httpSecurity.build();
     }
 
