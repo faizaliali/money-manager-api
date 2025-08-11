@@ -1,6 +1,6 @@
 package in.faizali.moneymanager.service;
 
-//import java.util.Collection;
+
 import java.util.Collections;
 
 import org.springframework.security.core.userdetails.User;
@@ -14,10 +14,12 @@ import in.faizali.moneymanager.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 
 
+
 @Service
 @RequiredArgsConstructor
 public class AppUserDetailsService implements UserDetailsService{
-    private final ProfileRepository profileRepository;
+    private final  ProfileRepository profileRepository;
+
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException{

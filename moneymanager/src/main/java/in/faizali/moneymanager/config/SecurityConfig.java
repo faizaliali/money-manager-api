@@ -21,25 +21,43 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import in.faizali.moneymanager.security.JwtRequestFilter;
 import in.faizali.moneymanager.service.AppUserDetailsService;
-import lombok.RequiredArgsConstructor;
+import in.faizali.moneymanager.util.JwtUtil;
+import lombok.RequiredArgsConstructor;  
+
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AppUserDetailsService appUserDetailsService;
-    private final JwtRequestFilter jwtRequestFilter;
-
+    private final  AppUserDetailsService appUserDetailsService;
+    //private final  JwtRequestFilter jwtRequestFilter;
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.cors(Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/status", "/health", "/register", "/activate", "/login").permitAll()
-                        .anyRequest().authenticated())
-                        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                        .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-        return httpSecurity.build();
-    }
+public JwtRequestFilter jwtRequestFilter(UserDetailsService userDetailsService, JwtUtil jwtUtil) {
+    return new JwtRequestFilter(userDetailsService, jwtUtil);
+}
+
+
+    // @Bean
+    // public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    //     httpSecurity.cors(Customizer.withDefaults())
+    //             .csrf(AbstractHttpConfigurer::disable)
+    //             .authorizeHttpRequests(auth -> auth.requestMatchers("/status", "/health", "/register", "/activate", "/login").permitAll()
+    //                     .anyRequest().authenticated())
+    //                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    //                     .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    //     return httpSecurity.build();
+    // }
+    @Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtRequestFilter jwtRequestFilter) throws Exception {
+    httpSecurity.cors(Customizer.withDefaults())
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(auth -> auth.requestMatchers("/status", "/health", "/register", "/activate", "/login").permitAll()
+                    .anyRequest().authenticated())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    return httpSecurity.build();
+}
+
    @Bean
     public UserDetailsService userDetailsService() {
     return appUserDetailsService;
@@ -61,9 +79,8 @@ public class SecurityConfig {
         return source;
     }
   @Bean
-public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-    return config.getAuthenticationManager();
-}
-
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 
 }

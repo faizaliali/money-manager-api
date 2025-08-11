@@ -1,16 +1,15 @@
 package in.faizali.moneymanager.repository;
 
-import in.faizali.moneymanager.entity.ExpenseEntity;
-//import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-//import org.springframework.security.core.parameters.P;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
+import in.faizali.moneymanager.entity.ExpenseEntity;
 
  public interface ExpenseRepository extends JpaRepository<ExpenseEntity, Long> {
 
