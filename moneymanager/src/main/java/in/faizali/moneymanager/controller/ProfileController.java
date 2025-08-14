@@ -27,6 +27,7 @@ public class ProfileController {
     @PostMapping("/register")
     public ResponseEntity<ProfileDTO> registerProfile(@RequestBody ProfileDTO profileDTO) {
         ProfileDTO registeredProfile = profileService.registerProfile(profileDTO);
+        
         return ResponseEntity.status(HttpStatus.CREATED).body(registeredProfile);
     }
 
@@ -55,6 +56,7 @@ public ResponseEntity<Map<String, Object>> login(@RequestBody AuthDTO authDTO) {
             .body(Map.of("message", "Invalid email or password"));
     }
 }
+
 
 
 

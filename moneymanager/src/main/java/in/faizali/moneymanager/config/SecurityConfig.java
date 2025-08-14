@@ -5,12 +5,9 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -22,46 +19,41 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import in.faizali.moneymanager.security.JwtRequestFilter;
 import in.faizali.moneymanager.service.AppUserDetailsService;
 import in.faizali.moneymanager.util.JwtUtil;
-import lombok.RequiredArgsConstructor;  
-
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final  AppUserDetailsService appUserDetailsService;
-    //private final  JwtRequestFilter jwtRequestFilter;
-    @Bean
-public JwtRequestFilter jwtRequestFilter(UserDetailsService userDetailsService, JwtUtil jwtUtil) {
-    return new JwtRequestFilter(userDetailsService, jwtUtil);
-}
+    private final AppUserDetailsService appUserDetailsService;
+      private final JwtUtil jwtUtil;
 
-
-    // @Bean
-    // public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-    //     httpSecurity.cors(Customizer.withDefaults())
-    //             .csrf(AbstractHttpConfigurer::disable)
-    //             .authorizeHttpRequests(auth -> auth.requestMatchers("/status", "/health", "/register", "/activate", "/login").permitAll()
-    //                     .anyRequest().authenticated())
-    //                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-    //                     .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-    //     return httpSecurity.build();
-    // }
     @Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtRequestFilter jwtRequestFilter) throws Exception {
-    httpSecurity.cors(Customizer.withDefaults())
-            .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth.requestMatchers("/status", "/health", "/register", "/activate", "/login").permitAll()
-                    .anyRequest().authenticated())
+    public JwtRequestFilter jwtRequestFilter() {
+        return new JwtRequestFilter(appUserDetailsService, jwtUtil);
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtRequestFilter jwtRequestFilter) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .authorizeHttpRequests(auth -> auth
+                // Match endpoints with or without context path
+                .requestMatchers("/status", "/health", "/register", "/activate", "/login", "/api/v1.0/status", "/api/v1.0/health", "/api/v1.0/register", "/api/v1.0/activate", "/api/v1.0/login").permitAll()
+                .anyRequest().authenticated()
+            )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-    return httpSecurity.build();
-}
 
-   @Bean
-    public UserDetailsService userDetailsService() {
-    return appUserDetailsService;
-}
+        return http.build();
+    }
+
+    // @Bean
+    // public UserDetailsService userDetailsService() {
+    //     return appUserDetailsService;
+    // }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -72,15 +64,25 @@ public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtReq
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization","Content-Type", "Accept"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
-  @Bean
+
+    @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
+    
+    // @Bean
+    // public AuthenticationManager authenticationManager() {
+    //     DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+    //     authenticationProvider.setUserDetailsService(appUserDetailsService);
+    //     authenticationProvider.setPasswordEncoder(passwordEncoder());
+    //     return new ProviderManager(authenticationProvider);
+    // }
 }

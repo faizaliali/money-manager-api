@@ -27,11 +27,9 @@ public class ProfileService {
     
     private final EmailService emailService;
 
-
-    //private final AppUserDetailsService appUserDetailsService;
-
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
+
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
 
@@ -40,7 +38,6 @@ public class ProfileService {
 
     public ProfileDTO registerProfile(ProfileDTO profileDTO){
         ProfileEntity newProfile=toEntity(profileDTO);
-      
         newProfile.setActivationToken(UUID.randomUUID().toString());
         profileRepository.save(newProfile);
         //Send activation email
@@ -50,6 +47,8 @@ public class ProfileService {
         emailService.sendEmail(newProfile.getEmail(), subject, body);
         return toDTO(newProfile);
     }
+
+    
 
     public ProfileEntity toEntity(ProfileDTO profileDTO){
         return ProfileEntity.builder()
@@ -120,7 +119,7 @@ public class ProfileService {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authDTO.getEmail(), authDTO.getPassword()));
             String token=jwtUtil.generateToken(authDTO.getEmail());
             return Map.of(
-                "Token",token,
+                "token",token,
                 "user",getPublicProfile(authDTO.getEmail())
             );
         } catch (BadCredentialsException | UsernameNotFoundException e) {
