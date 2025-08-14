@@ -29,7 +29,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
            String path = request.getRequestURI();
 
-        if (path.equals("/api/v1.0/login")  || path.equals("/api/v1.0/auth/activate")  || path.equals("/api/v1.0/register") || path.startsWith("/public/")) {
+        if (path.equals("/api/v1.0/login")  || path.equals("/api/v1.0/activate")  || path.equals("/api/v1.0/register") || path.startsWith("/public/")) {
         filterChain.doFilter(request, response);
         return;
     }
